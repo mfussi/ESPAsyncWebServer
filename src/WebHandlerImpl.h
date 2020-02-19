@@ -88,6 +88,12 @@ class AsyncCallbackWebHandler: public AsyncWebHandler {
       if(!_onRequest)
         return false;
 
+#ifdef MIN_FREE_HEAP_TO_SERVICE_REST
+      if (ESP.getFreeHeap() < MIN_FREE_HEAP_TO_SERVICE_REST) {
+        return false;
+      }
+#endif
+
       if(!(_method & request->method()))
         return false;
 
@@ -107,7 +113,7 @@ class AsyncCallbackWebHandler: public AsyncWebHandler {
 #endif
       if (_uri.length() && _uri.endsWith("*")) {
         String uriTemplate = String(_uri);
-	uriTemplate = uriTemplate.substring(0, uriTemplate.length() - 1);
+  uriTemplate = uriTemplate.substring(0, uriTemplate.length() - 1);
         if (!request->url().startsWith(uriTemplate))
           return false;
       }
